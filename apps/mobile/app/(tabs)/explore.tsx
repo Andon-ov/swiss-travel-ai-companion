@@ -1,20 +1,65 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SPOTS, Spot } from '../../constants/spots';
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight, MapPin } from 'lucide-react-native';
+import { useLocation } from '../../hooks/useLocation';
+
+// Haversine formula duplicated here for simplicity or we could export it
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371e3;
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 export default function ExploreScreen() {
   const router = useRouter();
+  const { location } = useLocation();
 
-  const renderItem = ({ item }: { item: Spot }) => (
+  const spotsWithDistance = SPOTS.map(spot => {
+    if (!location) return { ...spot, distance: null };
+    return {
+      ...spot,
+      distance: getDistance(
+        location.coords.latitude,
+        location.coords.longitude,
+        spot.lat,
+        spot.lng
+      )
+    };
+  }).sort((a, b) => {
+    if (a.distance === null) return 1;
+    if (b.distance === null) return -1;
+    return a.distance - b.distance;
+  });
+
+  const formatDistance = (meters: number | null) => {
+    if (meters === null) return '';
+    if (meters < 1000) return `${Math.round(meters)}m`;
+    return `${(meters / 1000).toFixed(1)}km`;
+  };
+
+  const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity 
       style={styles.card}
       onPress={() => router.push(`/spot/${item.id}`)}
     >
       <View style={styles.cardContent}>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.spotName}>{item.name}</Text>
-          <Text style={styles.spotCategory}>{item.category || 'Sightseeing'}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.spotCategory}>{item.category || 'Sightseeing'}</Text>
+            {item.distance !== null && (
+              <View style={styles.distanceBadge}>
+                <MapPin size={12} color="#666" />
+                <Text style={styles.distanceText}>{formatDistance(item.distance)}</Text>
+              </View>
+            )}
+          </View>
         </View>
         <ChevronRight size={20} color="#ccc" />
       </View>
@@ -24,7 +69,7 @@ export default function ExploreScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={SPOTS}
+        data={spotsWithDistance}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
@@ -61,10 +106,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   spotCategory: {
     fontSize: 14,
     color: '#666',
-    marginTop: 4,
     textTransform: 'capitalize',
+  },
+  distanceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 10,
+  },
+  distanceText: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 2,
   },
 });
