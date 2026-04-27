@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-alpine-blue: #1b4f8a;
+  --color-alpine-blue-light: #4a90d9;
+  --color-alpine-green: #2e7d32;
+  --color-alpine-green-light: #4caf50;
+  --color-alpine-snow: #f0f4f8;
+  --color-swiss-red: #ff0000;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-alpine-snow text-gray-900 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+}
+
+@layer utilities {
+  .bg-alpine-snow {
+    background-color: var(--color-alpine-snow);
+  }
+  .text-alpine-blue {
+    color: var(--color-alpine-blue);
+  }
+  .bg-alpine-blue {
+    background-color: var(--color-alpine-blue);
+  }
+  .text-alpine-blue-light {
+    color: var(--color-alpine-blue-light);
+  }
+  .bg-alpine-blue-light {
+    background-color: var(--color-alpine-blue-light);
+  }
+  .text-alpine-green {
+    color: var(--color-alpine-green);
+  }
+  .bg-alpine-green {
+    background-color: var(--color-alpine-green);
+  }
+  .bg-alpine-green-light {
+    background-color: var(--color-alpine-green-light);
+  }
+  .text-swiss-red {
+    color: var(--color-swiss-red);
+  }
+  .bg-swiss-red {
+    background-color: var(--color-swiss-red);
+  }
+  .ring-alpine-blue\/50 {
+    --tw-ring-color: rgba(27, 79, 138, 0.5);
+  }
+  .focus\:ring-alpine-blue\/50:focus {
+    --tw-ring-color: rgba(27, 79, 138, 0.5);
+  }
+  .focus\:border-alpine-blue:focus {
+    border-color: var(--color-alpine-blue);
+  }
+  .border-alpine-blue {
+    border-color: var(--color-alpine-blue);
+  }
+  .hover\:border-alpine-blue\/50:hover {
+    border-color: rgba(27, 79, 138, 0.5);
+  }
+}
