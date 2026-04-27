@@ -24,17 +24,21 @@
 - [x] Показване на разстоянието в списъка `Explore`.
 - [x] Бутон за сканиране на QR код директно от картата.
 
-## 🚀 Предстоящи стъпки
+## ✅ Фаза 3: Groq AI интеграция (Завършена)
+- [x] Разработка на Cloud Function `getSpotGuide` (Groq API + Firestore Cache).
+- [x] Имплементация на 24-часов кеш за AI генерираното съдържание.
+- [x] Hook `useSpotGuide` за лесно извличане на информация в приложението.
+- [x] Интеграция на AI текста в детайлната страница на обекта.
+- [x] Добавяне на TTS (Text-to-Speech) аудио гид чрез `expo-speech`.
+- [x] Компонент `AudioPlayer` за контрол на аудиото.
 
-### Фаза 3: Groq AI интеграция
-- [ ] Разработка на Cloud Function `getSpotGuide` (Groq API + Firestore Cache).
-- [ ] Hook `useSpotGuide` в приложението.
-- [ ] TTS (Text-to-Speech) за аудио четене.
+## 🚀 Предстоящи стъпки
 
 ### Фаза 4: Stripe плащания
 - [ ] Cloud Functions за Stripe (`createPayment`, `webhook`).
 - [ ] Интеграция на Stripe Payment Sheet в приложението.
 - [ ] Paywall логика (2 безплатни обекта, останалите платени).
+- [ ] Premium статус hook (`usePremium`).
 
 ---
 *Последна актуализация: Април 2026*

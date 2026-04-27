@@ -6,7 +6,7 @@ initializeApp();
 setGlobalOptions({ maxInstances: 10 });
 
 // Export functions here
-// export * from './groqProxy';
+export * from './groqProxy';
 // export * from './createPayment';
 // export * from './stripeWebhook';
 

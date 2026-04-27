@@ -1,10 +1,13 @@
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
 import { SPOTS } from '../../constants/spots';
+import { useSpotGuide } from '../../hooks/useSpotGuide';
+import { AudioPlayer } from '../../components/AudioPlayer';
 
 export default function SpotDetailScreen() {
   const { id } = useLocalSearchParams();
   const spot = SPOTS.find(s => s.id === id);
+  const { guide, loading, error } = useSpotGuide(id as string);
 
   if (!spot) {
     return (
@@ -29,9 +32,19 @@ export default function SpotDetailScreen() {
         
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>AI Guide</Text>
-          <Text style={styles.infoText}>
-            AI-generated guide content will appear here in Phase 3.
-          </Text>
+          
+          {loading ? (
+            <ActivityIndicator size="small" color="#007AFF" style={{ marginVertical: 20 }} />
+          ) : error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : (
+            <>
+              <Text style={styles.infoText}>
+                {guide || "AI is thinking about this place..."}
+              </Text>
+              {guide && <AudioPlayer text={guide} language="en" />}
+            </>
+          )}
         </View>
       </View>
     </ScrollView>
@@ -74,13 +87,18 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
   },
   infoTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
   },
   infoText: {
-    fontSize: 15,
-    color: '#666',
-    fontStyle: 'italic',
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#444',
   },
+  errorText: {
+    color: '#D32F2F',
+    fontStyle: 'italic',
+  }
 });
