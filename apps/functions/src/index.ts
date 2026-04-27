@@ -7,8 +7,8 @@ setGlobalOptions({ maxInstances: 10 });
 
 // Export functions here
 export * from './groqProxy';
-// export * from './createPayment';
-// export * from './stripeWebhook';
+export * from './createPayment';
+export * from './stripeWebhook';
 
 import { onRequest } from "firebase-functions/v2/https";
 export const helloWorld = onRequest((request, response) => {

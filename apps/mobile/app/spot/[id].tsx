@@ -1,13 +1,19 @@
+import React, { useState } from 'react';
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
 import { SPOTS } from '../../constants/spots';
 import { useSpotGuide } from '../../hooks/useSpotGuide';
+import { usePremium } from '../../hooks/usePremium';
 import { AudioPlayer } from '../../components/AudioPlayer';
+import { PaywallModal } from '../../components/PaywallModal';
+import { Lock } from 'lucide-react-native';
 
 export default function SpotDetailScreen() {
   const { id } = useLocalSearchParams();
   const spot = SPOTS.find(s => s.id === id);
-  const { guide, loading, error } = useSpotGuide(id as string);
+  const { isPremium, loading: authLoading, userId } = usePremium();
+  const { guide, loading: guideLoading, error } = useSpotGuide(id as string);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   if (!spot) {
     return (
@@ -16,6 +22,8 @@ export default function SpotDetailScreen() {
       </View>
     );
   }
+
+  const isLocked = !spot.isFree && !isPremium;
 
   return (
     <ScrollView style={styles.container}>
@@ -31,10 +39,26 @@ export default function SpotDetailScreen() {
         </Text>
         
         <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>AI Guide</Text>
+          <View style={styles.infoTitleRow}>
+            <Text style={styles.infoTitle}>AI Guide</Text>
+            {isLocked && <Lock size={20} color="#FF9500" />}
+          </View>
           
-          {loading ? (
+          {authLoading || (guideLoading && !isLocked) ? (
             <ActivityIndicator size="small" color="#007AFF" style={{ marginVertical: 20 }} />
+          ) : isLocked ? (
+            <View style={styles.lockedContainer}>
+              <Text style={styles.lockedText}>
+                This content is exclusive to Premium users. 
+                Unlock the full Brienz guide to read and listen to the AI-powered history of this place.
+              </Text>
+              <TouchableOpacity 
+                style={styles.unlockButton}
+                onPress={() => setShowPaywall(true)}
+              >
+                <Text style={styles.unlockButtonText}>Unlock Now</Text>
+              </TouchableOpacity>
+            </View>
           ) : error ? (
             <Text style={styles.errorText}>{error}</Text>
           ) : (
@@ -47,6 +71,17 @@ export default function SpotDetailScreen() {
           )}
         </View>
       </View>
+
+      <Modal
+        visible={showPaywall}
+        animationType="slide"
+        onRequestClose={() => setShowPaywall(false)}
+      >
+        <PaywallModal 
+          userId={userId || ''} 
+          onClose={() => setShowPaywall(false)} 
+        />
+      </Modal>
     </ScrollView>
   );
 }
@@ -85,17 +120,46 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#eee',
+    minHeight: 150,
+  },
+  infoTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   infoTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 12,
     color: '#333',
   },
   infoText: {
     fontSize: 16,
     lineHeight: 24,
     color: '#444',
+  },
+  lockedContainer: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  lockedText: {
+    fontSize: 15,
+    color: '#666',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    lineHeight: 22,
+    marginBottom: 20,
+  },
+  unlockButton: {
+    backgroundColor: '#FF9500',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 20,
+  },
+  unlockButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   errorText: {
     color: '#D32F2F',
